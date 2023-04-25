@@ -4,25 +4,45 @@
     "slug": "accesos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/checker_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/wolf_splash_.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#44413B"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+
+      "infoPlist": {
+        "NSCameraUsageDescription": "Captura de pantalla desactivada para proteger la privacidad de los usuarios"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/checker_icon.png",
+        "backgroundColor": "#7c7c7c"
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713",
+        "activities": {
+          "MainActivity": {
+            "windowSoftInputMode": "adjustResize",
+            "windowSecureFlag": "flag_secure"
+          }
+        }
       }
     },
+
+    "plugins": [
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
