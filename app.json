@@ -20,10 +20,13 @@
       }
     },
     "android": {
+      "versionCode": 1,
+      "package": "com.edapps.checker",
       "adaptiveIcon": {
         "foregroundImage": "./assets/EA.png",
         "backgroundColor": "#7c7c7c"
       },
+
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713",
         "activities": {
