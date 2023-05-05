@@ -4,6 +4,7 @@ import { routes } from "../../utils/routes";
 import AccesosScreen from "../views/Access/AccesosScreen";
 import ListScreen from "../views/Access/ListScreen";
 import HomeScreen from "../views/Access/HomeScreen";
+import TypeScreen from "../views/Access/TypesScreen";
 const Stack = createNativeStackNavigator();
 
 export default function AccessStack() {
@@ -22,6 +23,11 @@ export default function AccessStack() {
       <Stack.Screen
         name={routes.access.list.tab_key}
         component={ListScreen}
+        options={routes.access.options}
+      />
+      <Stack.Screen
+        name={routes.access.types.tab_key}
+        component={TypeScreen}
         options={routes.access.options}
       />
     </Stack.Navigator>

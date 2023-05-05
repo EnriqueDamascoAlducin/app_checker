@@ -5,19 +5,18 @@ import { useState, useEffect } from "react";
 
 import LoginScreen from "../screens/views/Account/LoginScreen";
 import ProfilePage from "../screens/views/Account/GuestScreen";
-import LoaderScreen from "../screens/views/Home/LoaderScreen";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AccessStack from "../screens/stacks/AccessStack";
-import AccountStack from "../screens/stacks/AccountStack";
 
+import { modelName, modelId, deviceName, osName } from "expo-device";
+import AccountScreen from "../screens/views/Account/AccountScreen";
 
 const Tab = createBottomTabNavigator();
 
 export function AppNavigation() {
   const [userLogged, setUserLogged] = useState(null);
-
-  const [isGuest, setIsGuest] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const url = routes.domain.url + "api/token";
   const storeData = async (value) => {
@@ -25,7 +24,7 @@ export function AppNavigation() {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("user", jsonValue);
     } catch (e) {
-      console.log(e);
+      console.log('Error catc ln 28');
     }
   };
 
@@ -34,7 +33,10 @@ export function AppNavigation() {
       email: userAccount,
       password: passwordAccount,
     };
-
+    if (!userAccount || !passwordAccount) {
+      setLoginError("Sin Permisos para acceder")
+      return false;
+    }
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -45,48 +47,66 @@ export function AppNavigation() {
         return response.json();
       })
       .then(async (data) => {
+        if(!data.is_guest &&  !data.permissions.showTabAccount && !data.permissions.showAccesstTab) {
+           setLoginError("Sin Permisos para acceder")
+        } else {
+           setLoginError("")
+        }
+        if (typeof data === "object" && data.success) {
+          setUserLogged(data);
+          try {
+            await storeData(data);
+          } catch (Exception) {
+            setUserLogged(null);
+            setLoginError("Error Almacenando la Información");
+          }
+        } else {
+          setUserLogged(null);
+          console.log("catcha app navigation ln 67");
+          setLoginError("No se encontro ningun usuario con esta información");
+        }
         return data;
       })
       .catch((error) => {
+        setUserLogged(null);
+        console.log("catcha app navigation ln 75");
+        setLoginError("No se encontro ningun usuario con esta información");
         return error;
       });
-    if (typeof response === "object" && response.success) {
-      setUserLogged(response);
-      setIsGuest(response.is_guest);
-      try {
-        await storeData(response);
-        return true;
-      } catch (Exception) {
-        setUserLogged(null);
-        return false;
-      }
-    } else {
-      await setUserLogged(null);
-      console.log("catcha app navigation ln 62");
-      return false;
-    }
   };
 
+  const logout = async () => {
+    checkAndRemoveItem();
+  };
   const checkAndRemoveItem = async () => {
     try {
       const itemValue = await AsyncStorage.getItem("user");
       if (itemValue !== null) {
-        // El item existe, se puede eliminar
         await AsyncStorage.removeItem("user");
         setUserLogged(null);
       }
     } catch (error) {
-      console.log(error);
+      console.log('error catc ln 92');
     }
   };
+
   useEffect(() => {
     checkAndRemoveItem();
+
+
+
   }, []);
-  if (isGuest) return <ProfilePage />;
-  else return userLogged ? <LoggedUser /> : <LoginScreen login={login} />;
+
+  if (userLogged && userLogged.is_guest) return <ProfilePage logout={logout} />;
+  else
+    return ((userLogged && loginError === '')  ? (
+      <LoggedUser user={userLogged}  logout={logout}  />
+    ) : (
+      <LoginScreen login={login} loginError={loginError} />
+    ));
 }
 
-function LoggedUser() {
+function LoggedUser({ user, logout }) {
   function backgroundColorActive(route) {
     if (route.name == routes.home.tab_key) {
       return "#322cea";
@@ -109,23 +129,24 @@ function LoggedUser() {
           headerShown: false,
         })}
       >
-        <Tab.Screen
-          name={routes.account.stack_key}
-          component={AccountStack}
-          options={routes.account.profile.options}
-        />
-        {/*<Tab.Screen name={routes.home.stack_key} component={HomeStack} options={routes.home.options} /> */}
-        <Tab.Screen
-          name={routes.access.stack_key}
-          component={AccessStack}
-          options={routes.access.options}
-        />
+        {(user.permissions && user.permissions.showTabAccount) ? (
+          <Tab.Screen
+            name={routes.account.stack_key}
+            component={AccountScreen}
+            options={routes.account.profile.options}
+          />
+        ) : null}
+        {(user.permissions && user.permissions.showAccesstTab )? (
+          <Tab.Screen
+            name={routes.access.stack_key}
+            component={AccessStack}
+            options={routes.access.options}
+          />
+        ) : null}
       </Tab.Navigator>
     </>
   );
 }
-
-function GuestScreen() {}
 
 function screenOptions(router, color, size) {
   var iconName;

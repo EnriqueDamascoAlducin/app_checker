@@ -1,12 +1,40 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { routes } from "../../../utils/routes";
-const HomeScreen = ({navigation}) => {
+import { useEffect, useState } from "react";
+import LoaderScreen from "../Home/LoaderScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const HomeScreen = ({ navigation }) => {
+  const [user, setUser] = useState("");
+
   const handleNewRegister = () => {
-    navigation.navigate(routes.access.register.tab_key);
-  }
+    navigation.navigate(routes.access.types.tab_key);
+  };
   const handleAccessList = () => {
     navigation.navigate(routes.access.list.tab_key);
+  };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("user");
+      if (value !== null) {
+        const valueJson = await JSON.parse(value);
+        setUser(valueJson);
+      }
+    } catch (e) {
+      setUser(null);
+      console.log("Account screeen catch ln 46");
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(function () {
+      getData();
+    }, 100);
+  }, []);
+
+  if (!user) {
+    return <LoaderScreen />;
   }
   return (
     <View style={styles.container}>
@@ -16,12 +44,20 @@ const HomeScreen = ({navigation}) => {
       />
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Accesos</Text>
-        <TouchableOpacity style={styles.button} onPress={handleAccessList}>
-          <Text style={styles.buttonText}>de hoy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}  onPress={handleNewRegister}>
-          <Text style={styles.buttonText}>Nuevo</Text>
-        </TouchableOpacity>
+        {user && user.permissions.watchList ? (
+          <TouchableOpacity style={styles.button} onPress={handleAccessList}>
+            <Text style={styles.buttonText}>Listado</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
+        {user && user.permissions.scanQr ? (
+          <TouchableOpacity style={styles.button} onPress={handleNewRegister}>
+            <Text style={styles.buttonText}>Nuevo</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
       </View>
     </View>
   );

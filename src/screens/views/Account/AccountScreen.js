@@ -86,18 +86,19 @@ const AccountScreen = () => {
     }, 1000);
   };
   useEffect(() => {
-    if(!isLogged) {
+    if (!isLogged) {
       setTimeout(function () {
         getData();
         startTimer();
         hideQr();
       }, 1000);
     } else {
-      getData();
+      getQr(user.token);
       startTimer();
       hideQr();
     }
   }, [qrReloaded]);
+  
   if (!isLogged) {
     return <LoaderScreen />;
   }
@@ -133,7 +134,7 @@ const AccountScreen = () => {
 };
 
 function GetAccountInfo({ showQr, reloadQr, timer, creationQr, qr, user }) {
-  if (showQr) {
+  if (showQr && user.permissions.showQr) {
     return (
       <>
         <View style={showQr ? styles.qrContainer : { display: "none" }}>
@@ -150,9 +151,10 @@ function GetAccountInfo({ showQr, reloadQr, timer, creationQr, qr, user }) {
           {user ? user.nick_name ?? user.fullname : "Invitado"}
         </Text>
         <Text style={styles.email}>{user ? user.email : ""} </Text>
+        {user.permissions.showQr ? 
         <Text style={styles.button} onPress={reloadQr}>
           {"Recargar QR"}
-        </Text>
+        </Text> : <></> }
       </>
     );
   }
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderWidth: 5,
-    borderColor: "white",
+    borderColor: "black",
     marginTop: 15,
   },
   name: {

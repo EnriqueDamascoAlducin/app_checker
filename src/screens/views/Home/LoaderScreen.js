@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
-const Loader = () => {
+const LoaderScreen = () => {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#fff" />
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Loader;
+export default LoaderScreen;

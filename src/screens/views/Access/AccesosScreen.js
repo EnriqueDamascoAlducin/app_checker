@@ -10,57 +10,96 @@ import {
 import React from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { useEffect, useState } from "react";
-import { Button } from "react-native-elements";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import SuccessIcon from "../../../../assets/success_icon.png";
-export default function App() {
+import WarningIcon from "../../../../assets/warning_icon.png";
+import ErrorIcon from "../../../../assets/error_icon.png";
+
+export default function AccesosScreen({ route }) {
+  const { type } = route.params;
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [user, setUser] = useState(null);
+  const [responseQr, setResponseQr] = useState(null);
 
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("user");
+      if (value !== null) {
+        const valueJson = await JSON.parse(value);
+        setUser(valueJson);
+      }
+    } catch (e) {
+      setUser(null);
+      console.log("Account screeen catch ln 46");
+    }
+  };
+
+  const validateQr = async (url) => {
+    if (!user.token) return;
+
+    const response = await fetch(url + '&type='+type, {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`, // notice the Bearer before your token
+      },
+    })
+      .then(async (response) => {
+        return await response.json();
+      })
+      .then(async (data) => await data)
+      .catch(async (error) => {
+        console.log("error validando qr");
+        return await error;
+      });
+    console.log(response);
+    setResponseQr(response);
+  };
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     };
-
+    getData();
     getBarCodeScannerPermissions();
+    console.log(type);
   }, []);
 
   const handleBarCodeScanned = ({ type, data }) => {
-    console.log(data);
-    console.log(type);
+    validateQr(data);
     setScanned(true);
     setShowModal(true);
-    //alert(`Bar code with type ${type} and data ${data} has been scanned!`);
   };
-
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return <Text>Solicitando permiso de la camara</Text>;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return <Text>Debes aceptar el permiso</Text>;
   }
 
   if (showModal === true) {
-    return <ShowModal setScanned={setScanned} setShowModal={setShowModal} />;
+    return (
+      <ShowModal
+        setScanned={setScanned}
+        setShowModal={setShowModal}
+        responseQr={responseQr}
+      />
+    );
   }
 
   return (
     <View style={styles.mainContainer}>
-      <Text style={{ color: "orange" }}>{"Apunta hacia el QR"}</Text>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+        style={styles.scanner}
       />
-      {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
-      )}
     </View>
   );
 }
-function ShowModal({ setScanned, setShowModal }) {
+function ShowModal({ setScanned, setShowModal, responseQr }) {
   const [modalVisible, setModalVisible] = useState(true);
+  if (!responseQr) return <></>;
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -74,10 +113,7 @@ function ShowModal({ setScanned, setShowModal }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>
-              Bienvenido Usuario! Gracias por llegar a tiemposin ti no haramos
-              nada
-            </Text>
+            <Text style={styles.modalText}>{responseQr.message}</Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => {
@@ -85,18 +121,29 @@ function ShowModal({ setScanned, setShowModal }) {
                 setShowModal(false);
               }}
             >
-              <Image source={SuccessIcon} alt="succes icon" />
-              <Text style={styles.textStyle}>Escanear de Nuevo</Text>
+              {responseQr.status == "success" ? (
+                <Image
+                  style={styles.modalIcon}
+                  source={SuccessIcon}
+                  alt="succes icon"
+                />
+              ) : responseQr.status == "warning" ? (
+                <Image
+                  style={styles.modalIcon}
+                  source={WarningIcon}
+                  alt="warning icon"
+                />
+              ) : (
+                <Image
+                  style={styles.modalIcon}
+                  source={ErrorIcon}
+                  alt="error icon"
+                />
+              )}
             </Pressable>
           </View>
         </View>
       </Modal>
-      <Pressable
-        style={[styles.button, styles.buttonOpen]}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text style={styles.textStyle}>Show Modal</Text>
-      </Pressable>
     </View>
   );
 }
@@ -137,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: "#29d831",
+    backgroundColor: "white",
   },
   textStyle: {
     color: "white",
@@ -148,5 +195,16 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+  modalIcon: {
+    width: 50,
+    height: 50,
+  },
+  scanner: {
+    ...StyleSheet.absoluteFillObject,
+    // en caso de modificar el tamaño del scanner
+    /*top: 100, // Adjust the top position to move the scanner down
+    height: 500, // Adjust the height to make the scanner smaller
+    marginHorizontal: 20, // Add horizontal margins to center the scanner*/
   },
 });

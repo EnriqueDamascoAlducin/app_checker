@@ -4,16 +4,16 @@
     "slug": "accesos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/checker_icon.png",
+    "icon": "./assets/EA.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/wolf_splash_.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#44413B"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
 
       "infoPlist": {
         "NSCameraUsageDescription": "Captura de pantalla desactivada para proteger la privacidad de los usuarios"
@@ -21,7 +21,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/checker_icon.png",
+        "foregroundImage": "./assets/EA.png",
         "backgroundColor": "#7c7c7c"
       },
       "config": {

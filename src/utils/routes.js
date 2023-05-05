@@ -15,6 +15,9 @@ export const routes = {
         options : {
             title : "Accesos"
         },
+        types : {
+            tab_key: "AcessTypes",
+        },
         register : {
             tab_key :"NewAccess"
         },
@@ -23,7 +26,7 @@ export const routes = {
         }
     },
     account: {
-        stack_key: "AccountStack",
+        stack_key: "AccountScreen",
         profile : {
             tab_key: "Account",
             options : {

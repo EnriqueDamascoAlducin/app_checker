@@ -1,6 +1,6 @@
 import Logo from "../../../../assets/checker_icon.png";
 import { Platform } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,29 +14,23 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const ModernLoginTemplate = ({ login }) => {
+const ModernLoginTemplate = ({ login, loginError }) => {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-
   const handleLogin = async () => {
     setIsLoading(true);
-    var isLoggedIn = false;
-    setHasError(false);
     try {
-
-      isLoggedIn = await login(user, password);
+      await login(user, password);
 
       setIsLoading(false);
-      setHasError(!isLoggedIn);
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
-
+useEffect(()=>{},[])
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -50,12 +44,14 @@ const ModernLoginTemplate = ({ login }) => {
           placeholder="Username"
           placeholderTextColor="#888"
           onChangeText={setUser}
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#888"
           onChangeText={setPassword}
+          autoCapitalize="none"
           secureTextEntry
         />
         <TouchableOpacity
@@ -72,9 +68,9 @@ const ModernLoginTemplate = ({ login }) => {
             <Text style={styles.buttonText}>Sign In</Text>
           )}
         </TouchableOpacity>
-        {hasError ? (
+        {loginError ? (
           <Text style={styles.title}>
-            No se encontro ningun usuario con esta informacion
+            {loginError}
           </Text>
         ) : (
           <></>
