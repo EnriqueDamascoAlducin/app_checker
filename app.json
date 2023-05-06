@@ -11,12 +11,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#44413B"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
-
       "infoPlist": {
-        "NSCameraUsageDescription": "Captura de pantalla desactivada para proteger la privacidad de los usuarios"
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access camera.",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
       }
     },
     "android": {
@@ -26,18 +28,13 @@
         "foregroundImage": "./assets/EA.png",
         "backgroundColor": "#7c7c7c"
       },
-
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713",
-        "activities": {
-          "MainActivity": {
-            "windowSoftInputMode": "adjustResize",
-            "windowSecureFlag": "flag_secure"
-          }
-        }
-      }
+        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
-
     "plugins": [
       [
         "expo-barcode-scanner",
@@ -48,6 +45,11 @@
     ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "29389196-fb73-4dff-9b9f-2838a764ef1e"
+      }
     }
   }
 }
