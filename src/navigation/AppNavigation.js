@@ -11,6 +11,8 @@ import AccessStack from "../screens/stacks/AccessStack";
 
 import { modelName, modelId, deviceName, osName } from "expo-device";
 import AccountScreen from "../screens/views/Account/AccountScreen";
+import InternetValidationScreen from "../screens/views/Home/InternetValidationScreen";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,12 +21,13 @@ export function AppNavigation() {
   const [loginError, setLoginError] = useState("");
 
   const url = routes.domain.url + "api/token";
+  const netInfo = useNetInfo();
   const storeData = async (value) => {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("user", jsonValue);
     } catch (e) {
-      console.log('Error catc ln 28');
+      console.log("Error catc ln 28");
     }
   };
 
@@ -34,7 +37,7 @@ export function AppNavigation() {
       password: passwordAccount,
     };
     if (!userAccount || !passwordAccount) {
-      setLoginError("Sin Permisos para acceder")
+      setLoginError("Sin Permisos para acceder");
       return false;
     }
     const requestOptions = {
@@ -47,10 +50,14 @@ export function AppNavigation() {
         return response.json();
       })
       .then(async (data) => {
-        if(!data.is_guest &&  !data.permissions.showTabAccount && !data.permissions.showAccesstTab) {
-           setLoginError("Sin Permisos para acceder")
+        if (
+          !data.is_guest &&
+          !data.permissions.showTabAccount &&
+          !data.permissions.showAccesstTab
+        ) {
+          setLoginError("Sin Permisos para acceder");
         } else {
-           setLoginError("")
+          setLoginError("");
         }
         if (typeof data === "object" && data.success) {
           setUserLogged(data);
@@ -86,24 +93,21 @@ export function AppNavigation() {
         setUserLogged(null);
       }
     } catch (error) {
-      console.log('error catc ln 92');
+      console.log("error catc ln 92");
     }
   };
 
   useEffect(() => {
     checkAndRemoveItem();
-
-
-
   }, []);
-
+  /*if (!netInfo.isConnected) return <InternetValidationScreen />;*/
   if (userLogged && userLogged.is_guest) return <ProfilePage logout={logout} />;
   else
-    return ((userLogged && loginError === '')  ? (
-      <LoggedUser user={userLogged}  logout={logout}  />
+    return userLogged && loginError === "" ? (
+      <LoggedUser user={userLogged} logout={logout} />
     ) : (
       <LoginScreen login={login} loginError={loginError} />
-    ));
+    );
 }
 
 function LoggedUser({ user, logout }) {
@@ -129,14 +133,14 @@ function LoggedUser({ user, logout }) {
           headerShown: false,
         })}
       >
-        {(user.permissions && user.permissions.showTabAccount) ? (
+        {user.permissions && user.permissions.showTabAccount ? (
           <Tab.Screen
             name={routes.account.stack_key}
             component={AccountScreen}
             options={routes.account.profile.options}
           />
         ) : null}
-        {(user.permissions && user.permissions.showAccesstTab )? (
+        {user.permissions && user.permissions.showAccesstTab ? (
           <Tab.Screen
             name={routes.access.stack_key}
             component={AccessStack}

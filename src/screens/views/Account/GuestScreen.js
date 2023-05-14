@@ -159,10 +159,10 @@ function QrImage({ qr }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#232323",
+    backgroundColor: "#7c7c7c",
   },
   header: {
-    backgroundColor: "#222",
+    backgroundColor: "#7c7c7c",
     height: 70,
     justifyContent: "center",
     alignItems: "center",
@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderWidth: 5,
-    borderColor: "black",
     marginTop: 15,
   },
   title: {
@@ -191,7 +190,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   scrollView: {
-    backgroundColor: "#232323",
+    backgroundColor: "#7c7c7c",
     paddingHorizontal: 20,
   },
   avatarContainer: {

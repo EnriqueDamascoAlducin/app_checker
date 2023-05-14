@@ -1,8 +1,9 @@
 {
   "expo": {
+    "owner": "ealducin",
     "name": "accesos",
     "slug": "accesos",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/EA.png",
     "userInterfaceStyle": "light",
@@ -19,7 +20,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access camera.",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
-      }
+      },
+      "bundleIdentifier": "com.edapps.checker"
     },
     "android": {
       "versionCode": 1,
